@@ -4,39 +4,57 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity" >
 
-    <TextView
-        android:layout_width="fill_parent"
+    <EditText
+        android:id="@+id/whereEditText"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="10dip"
-        android:text="Am I late?" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:ems="10"
+        android:hint="@string/whereHint"
+        android:inputType="textPostalAddress" >
 
-    <TextView
-        android:id="@+id/data"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="10dip" />
+        <requestFocus />
+    </EditText>
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal" >
+            <Button
+                android:id="@+id/amilateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:text="@string/amilateButtonText" />
 
-        <Button
-            android:id="@+id/previous"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dip"
-            android:text="Prev" />
+            <EditText
+                android:id="@+id/whenTimeEditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/whereEditText"
+                android:layout_below="@+id/whenDateEditText"
+                android:layout_marginTop="24dp"
+                android:ems="10"
+                android:hint="@string/whenHint"
+                android:inputType="time" />
 
-        <Button
-            android:id="@+id/next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dip"
-            android:text="Next" />
-    </LinearLayout>
+            <EditText
+                android:id="@+id/whenDateEditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/whenTimeEditText"
+                android:layout_below="@+id/whereEditText"
+                android:layout_marginTop="18dp"
+                android:ems="10"
+                android:hint="@string/whenDateHint"
+                android:inputType="date" />
+
+            <TextView
+                android:id="@+id/resultTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginBottom="94dp" />
 
 </RelativeLayout>
