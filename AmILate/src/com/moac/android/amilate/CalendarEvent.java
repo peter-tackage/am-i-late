@@ -1,5 +1,8 @@
 package com.moac.android.amilate;
 
+import java.text.SimpleDateFormat;
+
+import android.text.format.Time;
 import android.util.Log;
 
 public class CalendarEvent {
@@ -34,6 +37,7 @@ public class CalendarEvent {
 		}
 		
 		
+		
 		// We will only take the events with all the what, when, where in consideration for now
 		// Later version, we can prompt the user for more details
 		/*public boolean isComplete() {
@@ -41,10 +45,38 @@ public class CalendarEvent {
 			return true;				
 		}*/
 
-		public void printMe() {
+		public String getWhat() {
+			return what;
+		}
 
-	        String msg = "What: " + what + " Where: " + where + " When: "+ when + " Type: " + type;
-			Log.d("CalendarEvent", msg);
+		public String getWhere() {
+			return where;
+		}
+
+		public long getWhen() {
+			return when;
+		}
+
+		public int getType() {
+			return type;
+		}
+
+		@Override
+		public String toString() {
+	        return what;
+		}
+
+		public String getEventDetails() {
+			Time t = new Time();
+			t.set(when);
+			String msg = "What: " + what + "\nWhere: " + where + "\nWhen: "+ t.format3339(false) + "\nType: " + type;
+			return msg;
+		}
+
+		//TODO proper checks
+		public boolean isComplete() {
+			if (what == null || where == null) return false;
+			else return true;
 		}
 }
  

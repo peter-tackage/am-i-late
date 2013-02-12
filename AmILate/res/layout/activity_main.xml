@@ -1,60 +1,56 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     tools:context=".MainActivity" >
-
-    <EditText
-        android:id="@+id/whereEditText"
+     
+    <ImageView
+        android:id="@+id/pump"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
-        android:ems="10"
-        android:hint="@string/whereHint"
-        android:inputType="textPostalAddress" >
+        android:layout_marginBottom="4dp"
+		android:layout_centerHorizontal="true"
+        android:src="@drawable/pump" />
+    
+    
+    <TextView
+        android:id="@+id/pumpText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"          
+		android:layout_centerVertical="true"
+		android:layout_centerHorizontal="true"  
+		 android:layout_below="@id/pump"
+        android:gravity="center"             
+        android:text="@string/startService" />
+        
+    <ImageView
+        android:id="@+id/tea"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"        
+        android:layout_marginBottom="4dp"
+		android:layout_centerHorizontal="true"	
+        android:src="@drawable/relaxed" />
+         
+    <TextView
+        android:id="@+id/teaText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"  
+		android:layout_centerVertical="true"
+		android:layout_centerHorizontal="true" 
+	    android:layout_below="@id/tea"
+        android:gravity="center"
+        android:text="@string/stopService" />
 
-        <requestFocus />
-    </EditText>
+    
+    <ToggleButton
+        android:id="@+id/toggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:layout_centerHorizontal="true"
+        android:layout_marginTop="190dp"
+        android:textOff="Off - High tea time"
+        android:textOn="On - Under the pump" />
 
-            <Button
-                android:id="@+id/amilateButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:gravity="center"
-                android:text="@string/amilateButtonText" />
-
-            <EditText
-                android:id="@+id/whenTimeEditText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/whereEditText"
-                android:layout_below="@+id/whenDateEditText"
-                android:layout_marginTop="24dp"
-                android:ems="10"
-                android:hint="@string/whenHint"
-                android:inputType="time" />
-
-            <EditText
-                android:id="@+id/whenDateEditText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/whenTimeEditText"
-                android:layout_below="@+id/whereEditText"
-                android:layout_marginTop="18dp"
-                android:ems="10"
-                android:hint="@string/whenDateHint"
-                android:inputType="date" />
-
-            <TextView
-                android:id="@+id/resultTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_marginBottom="94dp" />
-
-</RelativeLayout>
+</RelativeLayout >

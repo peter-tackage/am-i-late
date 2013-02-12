@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Am I Late</string>
+    <string name="app_name">I\'m late! I\'m late!</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="whereHint">I need to be at...</string>
@@ -10,5 +10,7 @@
     <string name="selectTimeText">Time</string>
     <string name="selectDateText">Date</string>
     <string name="whenDateHint">On this date...</string>
+    <string name="startService">Important meetings this week.\n Can\'t be late!</string>
+    <string name="stopService">It\'s the weekend.\n Time to be fashionably late!</string>
 
 </resources>
