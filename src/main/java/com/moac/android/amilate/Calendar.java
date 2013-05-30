@@ -4,10 +4,13 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.CalendarContract;
 import android.text.format.Time;
+import android.util.Log;
 
 import java.util.ArrayList;
 
 public class Calendar {
+
+    private static final String TAG = Calendar.class.getSimpleName();
 
     public static final String[] CALENDAR_PROJECTION = new String[]{ CalendarContract.Events.TITLE, CalendarContract.Events.EVENT_LOCATION, CalendarContract.Events.DTSTART };
 
@@ -34,15 +37,16 @@ public class Calendar {
         mCursor = contentResolver.query(CalendarContract.Events.CONTENT_URI, Calendar.CALENDAR_PROJECTION, selection, null, null);
         mCursor.moveToFirst();
         allEvents = query(mCursor);
+        Log.i(TAG, "initAllEvent() - event count:" + allEvents.size());
     }
 
     private void initTestData() {
         // Sunday 4pm
         /*CalendarEvent event1 = new CalendarEvent();
-		event1.setWhen(1359907200000l);
+        event1.setWhen(1359907200000l);
 		event1.setWhat("Demo time");
 		event1.setWhere("Schohausser Allee 36");*/
-		
+
 		/* we should always be late for this one
 		CalendarEvent event2 = new CalendarEvent();
 		event2 .setWhen(1359846000000l);
@@ -83,29 +87,23 @@ public class Calendar {
     }
 
     public ArrayList<CalendarEvent> query(Cursor mCursor) {
-
         ArrayList<CalendarEvent> results = new ArrayList<CalendarEvent>();
 
         mCursor.moveToFirst();
         while(mCursor.isAfterLast() == false) {
             try {
-
                 CalendarEvent calendarEvent = new CalendarEvent();
                 calendarEvent.setWhat(mCursor.getString(0));
                 calendarEvent.setWhere(mCursor.getString(1));
                 calendarEvent.setWhen(mCursor.getLong(2));
                 results.add(calendarEvent);
             } catch(Exception e) {
-                //ignore
+                Log.e(TAG, "query() - Exception query Calendar: " + e.getLocalizedMessage());
             }
-
             mCursor.moveToNext();
         }
         mCursor.close();
         return results;
     }
 
-    public Cursor getCursor() {
-        return mCursor;
-    }
 }
