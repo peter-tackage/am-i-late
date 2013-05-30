@@ -10,14 +10,6 @@ buildscript {
 
 apply plugin: 'android'
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    compile group: 'com.google.android', name: 'support-v4', version: 'r7'
-}
-
 android {
     compileSdkVersion 17
     buildToolsVersion "17.0.0"
