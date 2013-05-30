@@ -156,6 +156,11 @@ public class NotificationService extends Service {
 
             Log.i(TAG, "Last known location was: " + lastKnown);
 
+            if (lastKnown == null)
+                return null;
+
+            // From the Google Directions API
+            //
             // origin - The address or textual latitude/longitude value from
             // which you wish to calculate directions. If you pass an address as
             // a string, the Directions service will geocode the string and
@@ -263,6 +268,9 @@ public class NotificationService extends Service {
 
         public void onPostExecute(NotificationEvent notificationEvent) {
 
+            if (notificationEvent == null)
+                return;
+
             long travelTime = notificationEvent.getTravelTime();
             if(travelTime != FAILURE) {
                 Time t = new Time();
@@ -283,12 +291,9 @@ public class NotificationService extends Service {
                       + "It takes " + String.valueOf(travelTime / 60) + " minutes to get there!";
                     Log.i(TAG, notificationEvent.getCalendarEvent().getEventDetails() + " " + lateText);
                     showNotification(calendarEvent, lateText);
-                    //answerText.setText("You're late by " + (lateBy / 60) + " minutes.\n"
-                    //	+ "It takes " + (travelTime.longValue() / 60) + " minutes to get there!");
                 }
             } else {
                 Log.i(TAG, "Sorry, I can't tell you...");
-                //answerText.setText("Sorry, I can't tell you...");
             }
         }
     }
