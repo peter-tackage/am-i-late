@@ -11,10 +11,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.ToggleButton;
+import android.view.animation.*;
+import android.widget.*;
 
 public class MainActivity extends Activity {
 
@@ -85,21 +83,39 @@ public class MainActivity extends Activity {
         ToggleButton toggle = (ToggleButton) findViewById(R.id.toggleButton);
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                Animation fadeOut = new AlphaAnimation(1, 0);
+                fadeOut.setInterpolator(new LinearInterpolator()); //and this
+                fadeOut.setDuration(200);
+
+                Animation fadeIn = new AlphaAnimation(0, 1);
+                fadeIn.setInterpolator(new LinearInterpolator()); //add this
+                fadeIn.setDuration(200);
+
                 if(isChecked) {
+
                     // The toggle is enabled
+                    teaText.setAnimation(fadeOut);
                     teaText.setVisibility(View.INVISIBLE);
+                    teaImage.setAnimation(fadeOut);
                     teaImage.setVisibility(View.INVISIBLE);
 
+                    pumpText.setAnimation(fadeIn);
                     pumpText.setVisibility(View.VISIBLE);
+                    pumpImage.setAnimation(fadeIn);
                     pumpImage.setVisibility(View.VISIBLE);
 
                     startWatch();
                 } else {
                     // The toggle is disabled
+                    teaText.setAnimation(fadeIn);
                     teaText.setVisibility(View.VISIBLE);
+                    teaImage.setAnimation(fadeIn);
                     teaImage.setVisibility(View.VISIBLE);
 
+                    pumpText.setAnimation(fadeOut);
                     pumpText.setVisibility(View.INVISIBLE);
+                    pumpImage.setAnimation(fadeOut);
                     pumpImage.setVisibility(View.INVISIBLE);
 
                     stopWatch();
