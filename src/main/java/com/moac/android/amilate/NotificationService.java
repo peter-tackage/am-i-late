@@ -82,9 +82,9 @@ public class NotificationService extends Service {
     private void showNotification(CalendarEvent event, String text) {
 
         Notification.Builder whiteRabbitNotification = new Notification.Builder(this)
-        .setSmallIcon(R.drawable.white_rabbit)
-        .setContentTitle(event.getWhat() + " in " + event.getWhere())
-        .setContentText(text);
+          .setSmallIcon(R.drawable.white_rabbit)
+          .setContentTitle(event.getWhat() + " in " + event.getWhere())
+          .setContentText(text);
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // let's keep it simple
@@ -101,6 +101,7 @@ public class NotificationService extends Service {
 
     class CheckWatchTimerTask extends TimerTask {
 
+        @Override
         public void run() {
 
             Runnable runnable = new Runnable() {
@@ -141,11 +142,6 @@ public class NotificationService extends Service {
             this.eventTime = event.getWhen() / 1000;
         }
 
-			/*@Override
-			protected void onPreExecute(){
-				answerText.setText("Checking...");
-			}*/
-
         @Override
         protected NotificationEvent doInBackground(Void... params) {
             Log.i(TAG, "Running background directions query with params");
@@ -156,7 +152,7 @@ public class NotificationService extends Service {
 
             Log.i(TAG, "Last known location was: " + lastKnown);
 
-            if (lastKnown == null)
+            if(lastKnown == null)
                 return null;
 
             // From the Google Directions API
@@ -268,7 +264,7 @@ public class NotificationService extends Service {
 
         public void onPostExecute(NotificationEvent notificationEvent) {
 
-            if (notificationEvent == null)
+            if(notificationEvent == null)
                 return;
 
             long travelTime = notificationEvent.getTravelTime();
@@ -284,7 +280,6 @@ public class NotificationService extends Service {
                 long leaveTime = eventTime - travelTime;
                 if(leaveTime > currentSec) {
                     Log.i(TAG, notificationEvent.getCalendarEvent().getEventDetails() + " On time! :)");
-                    // answerText.setText("You're on time");
                 } else {
                     long lateBy = currentSec - leaveTime;
                     String lateText = "Let's go!\n"
