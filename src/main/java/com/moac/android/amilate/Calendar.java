@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class Calendar {
 
-    public static final String[] COLS = new String[]{ CalendarContract.Events.TITLE, CalendarContract.Events.EVENT_LOCATION, CalendarContract.Events.DTSTART };
+    public static final String[] CALENDAR_PROJECTION = new String[]{ CalendarContract.Events.TITLE, CalendarContract.Events.EVENT_LOCATION, CalendarContract.Events.DTSTART };
 
     private ArrayList<CalendarEvent> allEvents;
 
@@ -20,8 +20,8 @@ public class Calendar {
     public Calendar(ContentResolver contentResolver) {
         allEvents = new ArrayList<CalendarEvent>();
         this.contentResolver = contentResolver;
-        //initAllEvents();
-        initTestData();
+        initAllEvents();
+        //initTestData();
     }
 
     public void initAllEvents() {
@@ -31,7 +31,7 @@ public class Calendar {
         t.setToNow();
         String selection = "(" + CalendarContract.Events.DTSTART
           + " >= " + t.toMillis(false) + ")";
-        mCursor = contentResolver.query(CalendarContract.Events.CONTENT_URI, Calendar.COLS, selection, null, null);
+        mCursor = contentResolver.query(CalendarContract.Events.CONTENT_URI, Calendar.CALENDAR_PROJECTION, selection, null, null);
         mCursor.moveToFirst();
         allEvents = query(mCursor);
     }
@@ -77,7 +77,7 @@ public class Calendar {
         String[] selectionArgs = new String[]{ dtStart, dtEnd };
 
         Cursor nextHourCursor;
-        nextHourCursor = contentResolver.query(CalendarContract.Events.CONTENT_URI, Calendar.COLS, selection, selectionArgs, null);
+        nextHourCursor = contentResolver.query(CalendarContract.Events.CONTENT_URI, Calendar.CALENDAR_PROJECTION, selection, selectionArgs, null);
         nextHourCursor.moveToFirst();
         return query(nextHourCursor);
     }
