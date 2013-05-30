@@ -49,10 +49,8 @@ public class MainActivity extends Activity {
             // location.getLatitude() + ", " +
             // location.getLongitude()).sendToTarget();
 
-            Log.i(TAG, "Received location update: " + location);
+            Log.d(TAG, "Received location update: " + location);
 
-            // Can't query without a last known location.
-            //amilateButton.setEnabled(location != null);
         }
 
         @Override
@@ -119,32 +117,6 @@ public class MainActivity extends Activity {
         calendar = new Calendar(getContentResolver());
     }
 
-	/*public void onToggleClicked(View view) {
-	    // Is the toggle on?
-	    boolean on = ((ToggleButton) view).isChecked();
-	    
-	    if (on) {
-	    	 // The toggle is enabled
-        	teaText.setVisibility(View.INVISIBLE);
-    		teaImage.setVisibility(View.INVISIBLE);
-
-    		pumpText.setVisibility(View.VISIBLE);
-    		pumpImage.setVisibility(View.VISIBLE);
-    		
-    		startWatch();
-    		
-	    } else {	    	
-            // The toggle is disabled
-        	teaText.setVisibility(View.VISIBLE);
-    		teaImage.setVisibility(View.VISIBLE);	    		
-
-    		pumpText.setVisibility(View.INVISIBLE);
-    		pumpImage.setVisibility(View.INVISIBLE);
-    		
-    		stopWatch();
-	    }
-	}*/
-
     public void startWatch() {
         if(!monitoring) {
             Intent i = new Intent(this, NotificationService.class);
@@ -183,22 +155,16 @@ public class MainActivity extends Activity {
         // location provider is enabled each time the activity resumes from the
         // stopped state.
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		/*final boolean gpsEnabled = locationManager
+		final boolean gpsEnabled = locationManager
 				.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
 		if (!gpsEnabled) {
-			Toast.makeText(this, "No GPS Enabled!", Toast.LENGTH_LONG).show();
-		} else {
-			Toast.makeText(this, "GPS is enabled! Good one!!!",
-					Toast.LENGTH_SHORT).show();
-
-		}*/
-
+			Toast.makeText(this, "Location access not enabled; how will you know if you're late?", Toast.LENGTH_LONG).show();
+		}
     }
 
     @Override
     protected void onStop() {
-        super.onStop();
         locationManager.removeUpdates(listener);
+        super.onStop();
     }
 }
