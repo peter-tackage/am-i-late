@@ -36,7 +36,7 @@ public class CalendarEvent {
     // We will only take the events with all the what, when, where in consideration for now
     // Later version, we can prompt the user for more details
         /*public boolean isComplete() {
-			if (what == null || when == null || where == null ) return false;
+            if (what == null || when == null || where == null ) return false;
 			return true;				
 		}*/
 

@@ -11,16 +11,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.view.animation.*;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.widget.*;
 
 public class MainActivity extends Activity {
 
-    private Calendar calendar = null;
-
     private static final String TAG = MainActivity.class.getSimpleName();
-
-    private static final long FAILURE = -1;
 
     private boolean monitoring = false;
 
@@ -48,7 +46,6 @@ public class MainActivity extends Activity {
             // location.getLongitude()).sendToTarget();
 
             Log.d(TAG, "Received location update: " + location);
-
         }
 
         @Override
@@ -85,11 +82,11 @@ public class MainActivity extends Activity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 Animation fadeOut = new AlphaAnimation(1, 0);
-                fadeOut.setInterpolator(new LinearInterpolator()); //and this
+                fadeOut.setInterpolator(new LinearInterpolator());
                 fadeOut.setDuration(200);
 
                 Animation fadeIn = new AlphaAnimation(0, 1);
-                fadeIn.setInterpolator(new LinearInterpolator()); //add this
+                fadeIn.setInterpolator(new LinearInterpolator());
                 fadeIn.setDuration(200);
 
                 if(isChecked) {
@@ -129,8 +126,6 @@ public class MainActivity extends Activity {
           .getSystemService(Context.LOCATION_SERVICE);
         locationProvider = locationManager
           .getProvider(LocationManager.GPS_PROVIDER);
-
-        calendar = new Calendar(getContentResolver());
     }
 
     public void startWatch() {
@@ -171,11 +166,11 @@ public class MainActivity extends Activity {
         // location provider is enabled each time the activity resumes from the
         // stopped state.
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		final boolean gpsEnabled = locationManager
-				.isProviderEnabled(LocationManager.GPS_PROVIDER);
-		if (!gpsEnabled) {
-			Toast.makeText(this, "Location access not enabled; how will you know if you're late?", Toast.LENGTH_LONG).show();
-		}
+        final boolean gpsEnabled = locationManager
+          .isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if(!gpsEnabled) {
+            Toast.makeText(this, "Location access not enabled; how will you know if you're late?", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
