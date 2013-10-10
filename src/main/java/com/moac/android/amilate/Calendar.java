@@ -7,66 +7,65 @@ import android.text.format.Time;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Calendar {
 
     private static final String TAG = Calendar.class.getSimpleName();
 
-    public static final String[] CALENDAR_PROJECTION = new String[]{CalendarContract.Events.TITLE, CalendarContract.Events.EVENT_LOCATION, CalendarContract.Events.DTSTART};
+    private static final String[] CALENDAR_PROJECTION = new String[]{CalendarContract.Events.TITLE, CalendarContract.Events.EVENT_LOCATION, CalendarContract.Events.DTSTART};
 
-    private ArrayList<CalendarEvent> allEvents;
-    private Cursor mCursor = null;
-    private ContentResolver contentResolver;
+    private List<CalendarEvent> mEvents;
 
-    public Calendar(ContentResolver contentResolver) {
-        allEvents = new ArrayList<CalendarEvent>();
-        this.contentResolver = contentResolver;
-        initAllEvents();
-        //initTestData();
+    public Calendar(ContentResolver _contentResolver) {
+        mEvents = getEvents(_contentResolver);
     }
 
-    public void initAllEvents() {
-        allEvents.clear();
-
+    private List<CalendarEvent> getEvents(ContentResolver _resolver) {
+        List<CalendarEvent> events;
         Time t = new Time();
         t.setToNow();
         String selection = "(" + CalendarContract.Events.DTSTART
                 + " >= " + t.toMillis(false) + ")";
-        mCursor = contentResolver.query(CalendarContract.Events.CONTENT_URI, Calendar.CALENDAR_PROJECTION, selection, null, null);
-        mCursor.moveToFirst();
-        allEvents = query(mCursor);
-        Log.i(TAG, "initAllEvent() - event count:" + allEvents.size());
+        Cursor mCursor = _resolver.query(CalendarContract.Events.CONTENT_URI, Calendar.CALENDAR_PROJECTION, selection, null, null);
+        if(mCursor == null)
+            return Collections.emptyList();
+
+        events = query(mCursor);
+        Log.i(TAG, "getEvents() - event count:" + events.size());
+        return events;
     }
 
-    private void initTestData() {
-        // Sunday 4pm
-        /*CalendarEvent event1 = new CalendarEvent();
-        event1.setWhen(1359907200000l);
-		event1.setWhat("Demo time");
-		event1.setWhere("Schohausser Allee 36");*/
+//    private void initTestData() {
+//        // Sunday 4pm
+//        /*CalendarEvent event1 = new CalendarEvent();
+//        event1.setWhen(1359907200000l);
+//		event1.setWhat("Demo time");
+//		event1.setWhere("Schohausser Allee 36");*/
+//
+//		/* we should always be late for this one
+//        CalendarEvent event2 = new CalendarEvent();
+//		event2 .setWhen(1359846000000l);
+//		event2 .setWhat("Party in Porto");
+//		event2 .setWhere("Porto Portugal");*/
+//
+//        // Sunday 5pm
+//        CalendarEvent event3 = new CalendarEvent();
+//        event3.setWhen(1359931807l);
+//        event3.setWhat("Mad Tea Party");
+//        event3.setWhere("Kreuzberg");
+//
+//        //mEvents.add(event1);
+//        //mEvents.add(event2);
+//        mEvents.add(event3);
+//    }
 
-		/* we should always be late for this one
-        CalendarEvent event2 = new CalendarEvent();
-		event2 .setWhen(1359846000000l);
-		event2 .setWhat("Party in Porto");
-		event2 .setWhere("Porto Portugal");*/
-
-        // Sunday 5pm
-        CalendarEvent event3 = new CalendarEvent();
-        event3.setWhen(1359931807l);
-        event3.setWhat("Mad Tea Party");
-        event3.setWhere("Kreuzberg");
-
-        //allEvents.add(event1);
-        //allEvents.add(event2);
-        allEvents.add(event3);
+    public List<CalendarEvent> getEvents() {
+        return mEvents;
     }
 
-    public ArrayList<CalendarEvent> getAllEvents() {
-        return allEvents;
-    }
-
-    public ArrayList<CalendarEvent> getNextHourEvents(ContentResolver contentResolver) {
+    private List<CalendarEvent> getNextHourEvents(ContentResolver _contentResolver) {
 
         String selection = "((" + CalendarContract.Events.DTSTART
                 + " >= ?) AND (" + CalendarContract.Events.DTEND + " <= ?))";
@@ -79,28 +78,29 @@ public class Calendar {
         String[] selectionArgs = new String[]{dtStart, dtEnd};
 
         Cursor nextHourCursor;
-        nextHourCursor = contentResolver.query(CalendarContract.Events.CONTENT_URI, Calendar.CALENDAR_PROJECTION, selection, selectionArgs, null);
-        nextHourCursor.moveToFirst();
+        nextHourCursor = _contentResolver.query(CalendarContract.Events.CONTENT_URI, Calendar.CALENDAR_PROJECTION, selection, selectionArgs, null);
+        if(nextHourCursor == null)
+            return Collections.emptyList();
         return query(nextHourCursor);
     }
 
-    public ArrayList<CalendarEvent> query(Cursor mCursor) {
-        ArrayList<CalendarEvent> results = new ArrayList<CalendarEvent>();
+    private List<CalendarEvent> query(Cursor _cursor) {
+        List<CalendarEvent> results = new ArrayList<CalendarEvent>();
 
-        mCursor.moveToFirst();
-        while (!mCursor.isAfterLast()) {
+        _cursor.moveToFirst();
+        while (!_cursor.isAfterLast()) {
             try {
                 CalendarEvent calendarEvent = new CalendarEvent();
-                calendarEvent.setWhat(mCursor.getString(0));
-                calendarEvent.setWhere(mCursor.getString(1));
-                calendarEvent.setWhen(mCursor.getLong(2));
+                calendarEvent.setWhat(_cursor.getString(0));
+                calendarEvent.setWhere(_cursor.getString(1));
+                calendarEvent.setWhen(_cursor.getLong(2));
                 results.add(calendarEvent);
             } catch (Exception e) {
                 Log.e(TAG, "query() - Exception query Calendar: " + e.getLocalizedMessage());
             }
-            mCursor.moveToNext();
+            _cursor.moveToNext();
         }
-        mCursor.close();
+        _cursor.close();
         return results;
     }
 }

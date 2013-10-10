@@ -1,20 +1,16 @@
 package com.moac.android.amilate;
 
+// Model class
 public class NotificationEvent {
 
-    private CalendarEvent calendarEvent;
-    private long travelTime;
+    private CalendarEvent mCalendarEvent;
+    private long mTravelTime;
 
-    public NotificationEvent(CalendarEvent calendarEvent, long travelTime) {
-        this.calendarEvent = calendarEvent;
-        this.travelTime = travelTime;
+    public NotificationEvent(CalendarEvent _calendarEvent, long _travelTime) {
+        mCalendarEvent = _calendarEvent;
+        mTravelTime = _travelTime;
     }
 
-    public CalendarEvent getCalendarEvent() {
-        return calendarEvent;
-    }
-
-    public long getTravelTime() {
-        return travelTime;
-    }
+    public CalendarEvent getCalendarEvent() { return mCalendarEvent; }
+    public long getTravelTime() { return mTravelTime; }
 }

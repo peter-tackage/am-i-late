@@ -22,32 +22,20 @@ public class MainActivity extends Activity {
 
     private boolean monitoring = false;
 
-    TextView teaText;
-    ImageView teaImage;
+    private TextView teaText;
+    private ImageView teaImage;
 
-    TextView pumpText;
-    ImageView pumpImage;
+    private TextView pumpText;
+    private ImageView pumpImage;
 
-    LocationManager locationManager = null;
-    LocationProvider locationProvider = null;
+    private LocationManager locationManager = null;
+    private LocationProvider locationProvider = null;
 
     private final LocationListener listener = new LocationListener() {
-
         @Override
         public void onLocationChanged(Location location) {
-            // A new location update is received. Do something useful with it.
-            // In this case,
-            // we're sending the update to a handler which then updates the UI
-            // with the new
-            // location.
-            // Message.obtain(mHandler,
-            // UPDATE_LATLNG,
-            // location.getLatitude() + ", " +
-            // location.getLongitude()).sendToTarget();
-
             Log.d(TAG, "Received location update: " + location);
         }
-
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) { }
         @Override
@@ -149,15 +137,15 @@ public class MainActivity extends Activity {
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 10000, // 10-second interval.
-                10, // 10 meters.
+                10, // 10 meters resolution.
                 listener);
 
-        // This verification should be done during onStart() because the system
-        // calls
-        // this method when the user returns to the activity, which ensures the
-        // desired
-        // location provider is enabled each time the activity resumes from the
-        // stopped state.
+        /**
+         * This verification should be done during onStart() because the system
+         * call this method when the user returns to the activity, which ensures the
+         * desired location provider is enabled each time the activity resumes from the
+         * stop state.
+         */
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         final boolean gpsEnabled = locationManager
                 .isProviderEnabled(LocationManager.GPS_PROVIDER);

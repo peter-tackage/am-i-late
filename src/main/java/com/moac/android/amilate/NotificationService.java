@@ -109,11 +109,7 @@ public class NotificationService extends Service {
                         public void run() {
                             QueryForDirectionsTask task;
                             calendar = new Calendar(getContentResolver());
-
-                            ArrayList<CalendarEvent> myEvents = calendar.getAllEvents();
-                            for (int i = 0; i < myEvents.size(); i++) {
-
-                                CalendarEvent event = myEvents.get(i);
+                            for(CalendarEvent event: calendar.getEvents()) {
                                 if (event.isComplete()) {
                                     task = new QueryForDirectionsTask(event);
                                     task.execute();
@@ -152,35 +148,37 @@ public class NotificationService extends Service {
             if (lastKnown == null)
                 return null;
 
-            // From the Google Directions API
-            //
-            // origin - The address or textual latitude/longitude value from
-            // which you wish to calculate directions. If you pass an address as
-            // a string, the Directions service will geocode the string and
-            // convert it to a latitude/longitude coordinate to calculate
-            // directions. If you pass coordinates, ensure that no space exists
-            // between the latitude and longitude values.
-            //
-            // destination - The address or textual latitude/longitude value
-            // from which you wish to calculate directions. If you pass an
-            // address as a string, the Directions service will geocode the
-            // string and convert it to a latitude/longitude coordinate to
-            // calculate directions. If you pass coordinates, ensure that no
-            // space exists between the latitude and longitude values.
-            //
-            // arrival_time - specifies the desired time of arrival for transit
-            // directions as seconds since midnight, January 1, 1970 UTC. One of
-            // departure_time or arrival_time must be specified when requesting
-            // transit directions.
+            /*
+            From the Google Directions API
 
-            // HTTP get
-            // Check response code
-            // Parse JSON
-            // Check directions status
-            // Extract time.
-            // Compare to current time
-            // If event time - travel time > current time .. then YOU'RE
-            // LATE!!!
+            origin - The address or textual latitude/longitude value from
+            which you wish to calculate directions. If you pass an address as
+            a string, the Directions service will geocode the string and
+            convert it to a latitude/longitude coordinate to calculate
+            directions. If you pass coordinates, ensure that no space exists
+            between the latitude and longitude values.
+
+            destination - The address or textual latitude/longitude value
+            from which you wish to calculate directions. If you pass an
+            address as a string, the Directions service will geocode the
+            string and convert it to a latitude/longitude coordinate to
+            calculate directions. If you pass coordinates, ensure that no
+            space exists between the latitude and longitude values.
+
+            arrival_time - specifies the desired time of arrival for transit
+            directions as seconds since midnight, January 1, 1970 UTC. One of
+            departure_time or arrival_time must be specified when requesting
+            transit directions.
+            */
+
+            /* HTTP get
+            Check response code
+            Parse JSON
+            Check directions status
+            Extract time.
+            Compare to current time
+            If event time - travel time > current time .. then YOU'RE
+            LATE!!! */
             AndroidHttpClient client = AndroidHttpClient
                     .newInstance("com.moac.android.amilate");
 
@@ -244,13 +242,10 @@ public class NotificationService extends Service {
                     Log.e(TAG, "Got bad status code from Google: " + statusCode);
                 }
             } catch (URISyntaxException e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (JSONException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } finally {
                 client.close();
@@ -260,7 +255,6 @@ public class NotificationService extends Service {
         }
 
         public void onPostExecute(NotificationEvent notificationEvent) {
-
             if (notificationEvent == null)
                 return;
 
@@ -276,12 +270,12 @@ public class NotificationService extends Service {
                 // Event Time - travel time
                 long leaveTime = eventTime - travelTime;
                 if (leaveTime > currentSec) {
-                    Log.i(TAG, notificationEvent.getCalendarEvent().getEventDetails() + " On time! :)");
+                    Log.i(TAG, notificationEvent.getCalendarEvent().getDebug() + " On time! :)");
                 } else {
                     long lateBy = currentSec - leaveTime;
                     String lateText = "Let's go!\n"
                             + "It takes " + String.valueOf(travelTime / 60) + " minutes to get there!";
-                    Log.i(TAG, notificationEvent.getCalendarEvent().getEventDetails() + " " + lateText);
+                    Log.i(TAG, notificationEvent.getCalendarEvent().getDebug() + " " + lateText);
                     showNotification(calendarEvent, lateText);
                 }
             } else {

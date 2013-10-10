@@ -2,76 +2,44 @@ package com.moac.android.amilate;
 
 import android.text.format.Time;
 
+// Model class
 public class CalendarEvent {
 
-    private static int IMPORTANT = 0;
-    private static int PARTY = 1;
+    public enum EventKinds {IMPORTANT, PARTY};
 
-    private String what;
-    private String where;
-    private long when;
-    private int type;
+    private String mWhat;
+    private String mWhere;
+    private long mWhen;
+    private EventKinds mType;
 
     public CalendarEvent() {
-        // defaut, all events are important
-        type = IMPORTANT;
+        // Default, all events are important
+        mType = EventKinds.IMPORTANT;
     }
 
-    public void setWhat(String what) {
-        this.what = what;
-    }
-
-    public void setWhen(long when) {
-        this.when = when;
-    }
-
-    public void setWhere(String where) {
-        this.where = where;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    // We will only take the events with all the what, when, where in consideration for now
-    // Later version, we can prompt the user for more details
-        /*public boolean isComplete() {
-            if (what == null || when == null || where == null ) return false;
-			return true;				
-		}*/
-
-    public String getWhat() {
-        return what;
-    }
-
-    public String getWhere() {
-        return where;
-    }
-
-    public long getWhen() {
-        return when;
-    }
-
-    public int getType() {
-        return type;
-    }
+    public void setWhat(String what) { mWhat = what; }
+    public void setWhen(long when) { mWhen = when; }
+    public void setWhere(String where) { mWhere = where; }
+    public void setType(EventKinds type) { mType = type; }
+    public String getWhat() { return mWhat; }
+    public String getWhere() { return mWhere; }
+    public long getWhen() { return mWhen; }
+    public EventKinds getType() { return mType; }
 
     @Override
     public String toString() {
-        return what;
+        return mWhat;
     }
 
-    public String getEventDetails() {
+    public String getDebug() {
         Time t = new Time();
-        t.set(when);
-        String msg = "What: " + what + "\nWhere: " + where + "\nWhen: " + t.format3339(false) + "\nType: " + type;
-        return msg;
+        t.set(mWhen);
+        return "What: " + mWhat + "\nWhere: " + mWhere + "\nWhen: " + t.format3339(false) + "\nType: " + mType;
     }
 
     //TODO proper checks
     public boolean isComplete() {
-        if (what == null || where == null) return false;
-        else return true;
+        return !(mWhat == null || mWhere == null);
     }
 }
  
