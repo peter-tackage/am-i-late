@@ -9,6 +9,15 @@ buildscript {
 
 apply plugin: 'android'
 
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.squareup.retrofit:retrofit:1.2.+'
+}
+
 android {
     compileSdkVersion 18
     buildToolsVersion "18.0.1"

@@ -9,7 +9,7 @@ public class CalendarEvent {
 
     private String mWhat;
     private String mWhere;
-    private long mWhen;
+    private long mWhen; // ms
     private EventKinds mType;
 
     public CalendarEvent() {
@@ -31,7 +31,7 @@ public class CalendarEvent {
         return mWhat;
     }
 
-    public String getDebug() {
+    public String getDebugString() {
         Time t = new Time();
         t.set(mWhen);
         return "What: " + mWhat + "\nWhere: " + mWhere + "\nWhen: " + t.format3339(false) + "\nType: " + mType;

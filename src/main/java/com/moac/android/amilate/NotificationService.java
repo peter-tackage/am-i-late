@@ -5,35 +5,28 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
-import android.net.http.AndroidHttpClient;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.text.format.Time;
 import android.util.Log;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.moac.android.amilate.api.GoogleMaps;
+import com.moac.android.amilate.api.model.Directions;
+import com.moac.android.amilate.api.model.Leg;
+import com.moac.android.amilate.api.model.Route;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+
+import retrofit.RestAdapter;
 
 public class NotificationService extends Service {
 
@@ -48,8 +41,19 @@ public class NotificationService extends Service {
     private LocationManager locationManager = null;
     private LocationProvider locationProvider = null;
 
+    private GoogleMaps mApi;
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "onStartCommand()");
+
+        // Create the Google Maps API interface
+        Uri.Builder uri = new Uri.Builder().scheme("http").authority("maps.googleapis.com");
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setServer(uri.toString())
+                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .build();
+        mApi = restAdapter.create(GoogleMaps.class);
 
         locationManager = (LocationManager) this
                 .getSystemService(Context.LOCATION_SERVICE);
@@ -58,7 +62,6 @@ public class NotificationService extends Service {
 
         handler = new Handler();
 
-        Log.w(getClass().getName(), "Got to start()!");
         // Kick off a timer that will check calendar every minute
         timer = new Timer();
         timer.schedule(new CheckWatchTimerTask(),
@@ -70,30 +73,18 @@ public class NotificationService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.i(TAG, "onDestroy()");
         stop();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.i(TAG, "onBind()");
         return (null);
     }
 
-    private void showNotification(CalendarEvent event, String text) {
-
-        Notification.Builder whiteRabbitNotification = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.white_rabbit)
-                .setContentTitle(event.getWhat() + " in " + event.getWhere())
-                .setContentText(text);
-
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        // let's keep it simple
-        // use the time as the unique id for the Notification
-        int id = ((Long) event.getWhen()).intValue();
-        mNotificationManager.notify(id, whiteRabbitNotification.build());
-    }
-
     private void stop() {
-        Log.w(getClass().getName(), "Got to stop()!");
+        Log.i(TAG, "Got to stop()!");
         timer.cancel();
         stopForeground(true);
     }
@@ -109,7 +100,7 @@ public class NotificationService extends Service {
                         public void run() {
                             QueryForDirectionsTask task;
                             calendar = new Calendar(getContentResolver());
-                            for(CalendarEvent event: calendar.getEvents()) {
+                            for (CalendarEvent event : calendar.getEvents()) {
                                 if (event.isComplete()) {
                                     task = new QueryForDirectionsTask(event);
                                     task.execute();
@@ -123,164 +114,107 @@ public class NotificationService extends Service {
         }
     }
 
+    // TODO Remove business logic and make more testable.
     private class QueryForDirectionsTask extends AsyncTask<Void, Void, NotificationEvent> {
 
-        private CalendarEvent calendarEvent;
-        public String eventLocation;
-        public long eventTime;
+        private CalendarEvent mCalendarEvent;
+        public String mEventLocation;
+        public long mEventTimeSec;
 
-        public QueryForDirectionsTask(CalendarEvent event) {
-            this.calendarEvent = event;
-            this.eventLocation = event.getWhere();
-            this.eventTime = event.getWhen() / 1000;
+        public QueryForDirectionsTask(CalendarEvent _event) {
+            this.mCalendarEvent = _event;
+            this.mEventLocation = _event.getWhere();
+            this.mEventTimeSec = TimeUnit.SECONDS.convert(_event.getWhen(), TimeUnit.MILLISECONDS);
         }
 
         @Override
-        protected NotificationEvent doInBackground(Void... params) {
-            Log.i(TAG, "Running background directions query with params");
+        protected NotificationEvent doInBackground(Void... _params) {
+            Log.i(TAG, "Running background directions query");
 
             // Let's ask the location provider for our current location
-            Location lastKnown = locationManager
-                    .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+           String best = locationManager.getBestProvider(new Criteria(), true);
+           Log.i(TAG, "Using Location Provider: " + best);
+           Location lastKnown = locationManager.getLastKnownLocation(best);
 
             Log.i(TAG, "Last known location was: " + lastKnown);
 
             if (lastKnown == null)
                 return null;
 
-            /*
-            From the Google Directions API
+            // Query Google Maps API
+            String origin = String.format("%s,%s", lastKnown.getLatitude(), lastKnown.getLongitude());
+            Directions directions = mApi.getDirections(origin, mEventLocation, mEventTimeSec, true);
 
-            origin - The address or textual latitude/longitude value from
-            which you wish to calculate directions. If you pass an address as
-            a string, the Directions service will geocode the string and
-            convert it to a latitude/longitude coordinate to calculate
-            directions. If you pass coordinates, ensure that no space exists
-            between the latitude and longitude values.
+            if (directions != null && directions.isOk()) {
+                long totalValue = 0;
+                List<Route> routes = directions.getRoutes();
+                if (!routes.isEmpty()) {
+                    // FIXME Check this assumption.
+                    // Pick the first, assume the best.
+                    Route bestRoute = routes.get(0);
 
-            destination - The address or textual latitude/longitude value
-            from which you wish to calculate directions. If you pass an
-            address as a string, the Directions service will geocode the
-            string and convert it to a latitude/longitude coordinate to
-            calculate directions. If you pass coordinates, ensure that no
-            space exists between the latitude and longitude values.
-
-            arrival_time - specifies the desired time of arrival for transit
-            directions as seconds since midnight, January 1, 1970 UTC. One of
-            departure_time or arrival_time must be specified when requesting
-            transit directions.
-            */
-
-            /* HTTP get
-            Check response code
-            Parse JSON
-            Check directions status
-            Extract time.
-            Compare to current time
-            If event time - travel time > current time .. then YOU'RE
-            LATE!!! */
-            AndroidHttpClient client = AndroidHttpClient
-                    .newInstance("com.moac.android.amilate");
-
-            try {
-
-                List<NameValuePair> qparams = new ArrayList<NameValuePair>();
-                qparams.add(new BasicNameValuePair("origin", lastKnown
-                        .getLatitude() + "," + lastKnown.getLongitude()));
-                qparams.add(new BasicNameValuePair("destination", this.eventLocation));
-                qparams.add(new BasicNameValuePair("arrival_time", Long
-                        .toString(this.eventTime)));
-                qparams.add(new BasicNameValuePair("sensor", Boolean.TRUE
-                        .toString()));
-
-                URI uri = URIUtils.createURI("http", "maps.googleapis.com", -1,
-                        "/maps/api/directions/json",
-                        URLEncodedUtils.format(qparams, "UTF-8"), null);
-                HttpGet httpget = new HttpGet(uri);
-
-                Log.i(TAG, "About to make query: "
-                        + httpget.getRequestLine().getUri());
-
-                HttpResponse response = client.execute(httpget);
-
-                int statusCode = response.getStatusLine().getStatusCode();
-
-                if (statusCode == 200) {
-                    Log.i(TAG, "Successful HTTP Response Google");
-
-                    // Now check the JSON value
-                    HttpEntity entity = response.getEntity();
-                    String jsonString = EntityUtils.toString(entity);
-                    JSONObject json = new JSONObject(jsonString);
-                    // Log.i(TAG, json.toString());
-
-                    String status = json.getString("status");
-                    if (status.equals("OK")) {
-                        // Let's extract the values of interest.
-                        Log.i(TAG, "Got good status from Google: " + status);
-
-                        long totalValue = 0;
-                        JSONArray routes = json.getJSONArray("routes");
-                        // TODO Assumptions about length etc here.
-                        JSONArray legs = routes.getJSONObject(0).getJSONArray(
-                                "legs");
-                        for (int i = 0; i < legs.length(); i++) {
-                            // Get the time - DURATION IN SECONDS!!
-                            JSONObject duration = legs.getJSONObject(i)
-                                    .getJSONObject("duration");
-                            long value = duration.getLong("value");
-                            totalValue += value;
-                        }
-
-                        Log.i(TAG, "Calculated total duration (sec): "
-                                + totalValue);
-                        return new NotificationEvent(calendarEvent, totalValue);
-                    } else {
-                        Log.e(TAG, "Got bad status from Google: " + status);
+                    for (Leg leg : bestRoute.getLegs()) {
+                        // Get the time - DURATION IN SECONDS!!
+                        totalValue += leg.getDuration().getValue();
                     }
-                } else {
-                    Log.e(TAG, "Got bad status code from Google: " + statusCode);
+                    Log.i(TAG, "Calculated total duration (sec): "
+                            + totalValue);
+                    return new NotificationEvent(mCalendarEvent, totalValue);
                 }
-            } catch (URISyntaxException e1) {
-                e1.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } finally {
-                client.close();
             }
-
-            return new NotificationEvent(calendarEvent, FAILURE);
+            return new NotificationEvent(mCalendarEvent, FAILURE);
         }
 
-        public void onPostExecute(NotificationEvent notificationEvent) {
-            if (notificationEvent == null)
+        public void onPostExecute(NotificationEvent _event) {
+            if (_event == null || _event.getTravelTime() == FAILURE) {
+                Log.w(TAG, "Some problem determining whether late or not");
+                // TODO User notification
                 return;
+            }
 
-            long travelTime = notificationEvent.getTravelTime();
-            if (travelTime != FAILURE) {
-                Time t = new Time();
-                t.setToNow();
-                long currentSec = t.toMillis(false) / 1000;
+            Time t = new Time();
+            t.setToNow();
+            long nowSec = TimeUnit.SECONDS.convert(t.toMillis(false), TimeUnit.MILLISECONDS);
 
-                Log.i(TAG, "Current time in seconds since epoch is: " + currentSec);
-
-                // Now we work out if we're ok.
-                // Event Time - travel time
-                long leaveTime = eventTime - travelTime;
-                if (leaveTime > currentSec) {
-                    Log.i(TAG, notificationEvent.getCalendarEvent().getDebug() + " On time! :)");
-                } else {
-                    long lateBy = currentSec - leaveTime;
-                    String lateText = "Let's go!\n"
-                            + "It takes " + String.valueOf(travelTime / 60) + " minutes to get there!";
-                    Log.i(TAG, notificationEvent.getCalendarEvent().getDebug() + " " + lateText);
-                    showNotification(calendarEvent, lateText);
-                }
+            boolean isLate = isLate(nowSec, _event.getTravelTime(), _event.getCalendarEvent().getWhen());
+            if (isLate) {
+                Log.i(TAG, "Event *is* late: " + mCalendarEvent.getDebugString());
+                buildLateNotification(_event, mCalendarEvent);
             } else {
-                Log.i(TAG, "Sorry, I can't tell you...");
+                Log.i(TAG, "Event *is not* late: " + mCalendarEvent.getDebugString());
             }
         }
+
+        protected void buildLateNotification(NotificationEvent _event, CalendarEvent _calendarEvent) {
+            // long lateBy = Math.abs(currentSec - leaveTime);
+            long minutes = TimeUnit.MINUTES.convert(_event.getTravelTime(), TimeUnit.SECONDS);
+            String lateText = "Let's go!\n"
+                    + "It takes " + minutes + " minutes to get there!";
+            showNotification(_calendarEvent, lateText);
+        }
+    }
+
+    protected boolean isLate(long _now, long _travelTime, long _eventTime) {
+        Log.i(TAG, "Current time in seconds since epoch is: " + _now);
+        // Now we work out if we're ok.
+        // TODO A buffer related to the polling period should be factored in.
+        long leaveTime = _eventTime - _travelTime;
+        return leaveTime > _now;
+    }
+
+    private void showNotification(CalendarEvent event, String text) {
+
+        // TODO Google Calendar Intent.
+        Notification.Builder whiteRabbitNotification = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.white_rabbit)
+                .setContentTitle(event.getWhat() + " in " + event.getWhere())
+                .setContentText(text);
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // let's keep it simple
+        // use the time as the unique id for the Notification
+        int id = ((Long) event.getWhen()).intValue();
+        mNotificationManager.notify(id, whiteRabbitNotification.build());
     }
 }
