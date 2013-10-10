@@ -49,19 +49,12 @@ public class MainActivity extends Activity {
         }
 
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            // TODO Auto-generated method stub
-        }
+        public void onStatusChanged(String provider, int status, Bundle extras) { }
+        @Override
+        public void onProviderEnabled(String provider) { }
 
         @Override
-        public void onProviderEnabled(String provider) {
-            // TODO Auto-generated method stub
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-            // TODO Auto-generated method stub
-        }
+        public void onProviderDisabled(String provider) { }
     };
 
     @Override
@@ -89,7 +82,7 @@ public class MainActivity extends Activity {
                 fadeIn.setInterpolator(new LinearInterpolator());
                 fadeIn.setDuration(200);
 
-                if(isChecked) {
+                if (isChecked) {
 
                     // The toggle is enabled
                     teaText.setAnimation(fadeOut);
@@ -123,13 +116,13 @@ public class MainActivity extends Activity {
         toggle.setChecked(true);
 
         locationManager = (LocationManager) this
-          .getSystemService(Context.LOCATION_SERVICE);
+                .getSystemService(Context.LOCATION_SERVICE);
         locationProvider = locationManager
-          .getProvider(LocationManager.GPS_PROVIDER);
+                .getProvider(LocationManager.GPS_PROVIDER);
     }
 
     public void startWatch() {
-        if(!monitoring) {
+        if (!monitoring) {
             Intent i = new Intent(this, NotificationService.class);
             startService(i);
             monitoring = true;
@@ -137,7 +130,7 @@ public class MainActivity extends Activity {
     }
 
     public void stopWatch() {
-        if(monitoring) {
+        if (monitoring) {
             stopService(new Intent(this, NotificationService.class));
             monitoring = false;
         }
@@ -146,7 +139,7 @@ public class MainActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_main, menu);
+        getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
@@ -155,9 +148,9 @@ public class MainActivity extends Activity {
         super.onStart();
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-          10000, // 10-second interval.
-          10, // 10 meters.
-          listener);
+                10000, // 10-second interval.
+                10, // 10 meters.
+                listener);
 
         // This verification should be done during onStart() because the system
         // calls
@@ -167,8 +160,8 @@ public class MainActivity extends Activity {
         // stopped state.
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         final boolean gpsEnabled = locationManager
-          .isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if(!gpsEnabled) {
+                .isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (!gpsEnabled) {
             Toast.makeText(this, "Location access not enabled; how will you know if you're late?", Toast.LENGTH_LONG).show();
         }
     }

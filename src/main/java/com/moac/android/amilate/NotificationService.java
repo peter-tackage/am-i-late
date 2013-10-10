@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.text.format.Time;
 import android.util.Log;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -41,21 +42,19 @@ public class NotificationService extends Service {
     private static final long FAILURE = -1;
 
     private Calendar calendar = null;
-
-    Timer timer;
-
+    private Timer timer;
     private Handler handler;
 
-    LocationManager locationManager = null;
-    LocationProvider locationProvider = null;
+    private LocationManager locationManager = null;
+    private LocationProvider locationProvider = null;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         locationManager = (LocationManager) this
-          .getSystemService(Context.LOCATION_SERVICE);
+                .getSystemService(Context.LOCATION_SERVICE);
         locationProvider = locationManager
-          .getProvider(LocationManager.GPS_PROVIDER);
+                .getProvider(LocationManager.GPS_PROVIDER);
 
         handler = new Handler();
 
@@ -63,8 +62,8 @@ public class NotificationService extends Service {
         // Kick off a timer that will check calendar every minute
         timer = new Timer();
         timer.schedule(new CheckWatchTimerTask(),
-          0,        //initial delay
-          120 * 1000);  //subsequent rate
+                0,        //initial delay
+                120 * 1000);  //subsequent rate
 
         return (START_NOT_STICKY);
     }
@@ -82,9 +81,9 @@ public class NotificationService extends Service {
     private void showNotification(CalendarEvent event, String text) {
 
         Notification.Builder whiteRabbitNotification = new Notification.Builder(this)
-          .setSmallIcon(R.drawable.white_rabbit)
-          .setContentTitle(event.getWhat() + " in " + event.getWhere())
-          .setContentText(text);
+                .setSmallIcon(R.drawable.white_rabbit)
+                .setContentTitle(event.getWhat() + " in " + event.getWhere())
+                .setContentText(text);
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // let's keep it simple
@@ -100,10 +99,8 @@ public class NotificationService extends Service {
     }
 
     class CheckWatchTimerTask extends TimerTask {
-
         @Override
         public void run() {
-
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
@@ -114,10 +111,10 @@ public class NotificationService extends Service {
                             calendar = new Calendar(getContentResolver());
 
                             ArrayList<CalendarEvent> myEvents = calendar.getAllEvents();
-                            for(int i = 0; i < myEvents.size(); i++) {
+                            for (int i = 0; i < myEvents.size(); i++) {
 
                                 CalendarEvent event = myEvents.get(i);
-                                if(event.isComplete()) {
+                                if (event.isComplete()) {
                                     task = new QueryForDirectionsTask(event);
                                     task.execute();
                                 }
@@ -148,11 +145,11 @@ public class NotificationService extends Service {
 
             // Let's ask the location provider for our current location
             Location lastKnown = locationManager
-              .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    .getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
             Log.i(TAG, "Last known location was: " + lastKnown);
 
-            if(lastKnown == null)
+            if (lastKnown == null)
                 return null;
 
             // From the Google Directions API
@@ -185,32 +182,32 @@ public class NotificationService extends Service {
             // If event time - travel time > current time .. then YOU'RE
             // LATE!!!
             AndroidHttpClient client = AndroidHttpClient
-              .newInstance("com.moac.android.amilate");
+                    .newInstance("com.moac.android.amilate");
 
             try {
 
                 List<NameValuePair> qparams = new ArrayList<NameValuePair>();
                 qparams.add(new BasicNameValuePair("origin", lastKnown
-                  .getLatitude() + "," + lastKnown.getLongitude()));
+                        .getLatitude() + "," + lastKnown.getLongitude()));
                 qparams.add(new BasicNameValuePair("destination", this.eventLocation));
                 qparams.add(new BasicNameValuePair("arrival_time", Long
-                  .toString(this.eventTime)));
+                        .toString(this.eventTime)));
                 qparams.add(new BasicNameValuePair("sensor", Boolean.TRUE
-                  .toString()));
+                        .toString()));
 
                 URI uri = URIUtils.createURI("http", "maps.googleapis.com", -1,
-                  "/maps/api/directions/json",
-                  URLEncodedUtils.format(qparams, "UTF-8"), null);
+                        "/maps/api/directions/json",
+                        URLEncodedUtils.format(qparams, "UTF-8"), null);
                 HttpGet httpget = new HttpGet(uri);
 
                 Log.i(TAG, "About to make query: "
-                  + httpget.getRequestLine().getUri());
+                        + httpget.getRequestLine().getUri());
 
                 HttpResponse response = client.execute(httpget);
 
                 int statusCode = response.getStatusLine().getStatusCode();
 
-                if(statusCode == 200) {
+                if (statusCode == 200) {
                     Log.i(TAG, "Successful HTTP Response Google");
 
                     // Now check the JSON value
@@ -220,7 +217,7 @@ public class NotificationService extends Service {
                     // Log.i(TAG, json.toString());
 
                     String status = json.getString("status");
-                    if(status.equals("OK")) {
+                    if (status.equals("OK")) {
                         // Let's extract the values of interest.
                         Log.i(TAG, "Got good status from Google: " + status);
 
@@ -228,47 +225,47 @@ public class NotificationService extends Service {
                         JSONArray routes = json.getJSONArray("routes");
                         // TODO Assumptions about length etc here.
                         JSONArray legs = routes.getJSONObject(0).getJSONArray(
-                          "legs");
-                        for(int i = 0; i < legs.length(); i++) {
+                                "legs");
+                        for (int i = 0; i < legs.length(); i++) {
                             // Get the time - DURATION IN SECONDS!!
                             JSONObject duration = legs.getJSONObject(i)
-                              .getJSONObject("duration");
+                                    .getJSONObject("duration");
                             long value = duration.getLong("value");
                             totalValue += value;
                         }
 
                         Log.i(TAG, "Calculated total duration (sec): "
-                          + totalValue);
-                        return new NotificationEvent(calendarEvent, Long.valueOf(totalValue));
+                                + totalValue);
+                        return new NotificationEvent(calendarEvent, totalValue);
                     } else {
                         Log.e(TAG, "Got bad status from Google: " + status);
                     }
                 } else {
                     Log.e(TAG, "Got bad status code from Google: " + statusCode);
                 }
-            } catch(URISyntaxException e1) {
+            } catch (URISyntaxException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
-            } catch(IOException e) {
+            } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-            } catch(JSONException e) {
+            } catch (JSONException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             } finally {
                 client.close();
             }
 
-            return new NotificationEvent(calendarEvent, Long.valueOf(FAILURE));
+            return new NotificationEvent(calendarEvent, FAILURE);
         }
 
         public void onPostExecute(NotificationEvent notificationEvent) {
 
-            if(notificationEvent == null)
+            if (notificationEvent == null)
                 return;
 
             long travelTime = notificationEvent.getTravelTime();
-            if(travelTime != FAILURE) {
+            if (travelTime != FAILURE) {
                 Time t = new Time();
                 t.setToNow();
                 long currentSec = t.toMillis(false) / 1000;
@@ -278,12 +275,12 @@ public class NotificationService extends Service {
                 // Now we work out if we're ok.
                 // Event Time - travel time
                 long leaveTime = eventTime - travelTime;
-                if(leaveTime > currentSec) {
+                if (leaveTime > currentSec) {
                     Log.i(TAG, notificationEvent.getCalendarEvent().getEventDetails() + " On time! :)");
                 } else {
                     long lateBy = currentSec - leaveTime;
                     String lateText = "Let's go!\n"
-                      + "It takes " + String.valueOf(travelTime / 60) + " minutes to get there!";
+                            + "It takes " + String.valueOf(travelTime / 60) + " minutes to get there!";
                     Log.i(TAG, notificationEvent.getCalendarEvent().getEventDetails() + " " + lateText);
                     showNotification(calendarEvent, lateText);
                 }

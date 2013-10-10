@@ -1,56 +1,56 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  tools:context=".MainActivity">
-
-  <ImageView
-    android:id="@+id/pump"
-    android:layout_width="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="40dp"
-    android:layout_marginBottom="4dp"
-    android:layout_centerHorizontal="true"
-    android:src="@drawable/pump" />
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/pump"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="4dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/pump" />
 
 
-  <TextView
-    android:id="@+id/pumpText"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_centerVertical="true"
-    android:layout_centerHorizontal="true"
-    android:layout_below="@id/pump"
-    android:gravity="center"
-    android:text="@string/startService" />
+    <TextView
+        android:id="@+id/pumpText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/pump"
+        android:gravity="center"
+        android:text="@string/startService" />
 
-  <ImageView
-    android:id="@+id/tea"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="40dp"
-    android:layout_marginBottom="4dp"
-    android:layout_centerHorizontal="true"
-    android:src="@drawable/relaxed" />
+    <ImageView
+        android:id="@+id/tea"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="4dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/relaxed" />
 
-  <TextView
-    android:id="@+id/teaText"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_centerVertical="true"
-    android:layout_centerHorizontal="true"
-    android:layout_below="@id/tea"
-    android:gravity="center"
-    android:text="@string/stopService" />
+    <TextView
+        android:id="@+id/teaText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/tea"
+        android:gravity="center"
+        android:text="@string/stopService" />
 
 
-  <ToggleButton
-    android:id="@+id/toggleButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_centerHorizontal="true"
-    android:layout_marginTop="190dp"
-    android:textOff="Off - High tea time"
-    android:textOn="On - Under the pump" />
+    <ToggleButton
+        android:id="@+id/toggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="190dp"
+        android:textOff="Off - High tea time"
+        android:textOn="On - Under the pump" />
 
 </RelativeLayout>

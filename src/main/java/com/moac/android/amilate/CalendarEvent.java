@@ -70,7 +70,7 @@ public class CalendarEvent {
 
     //TODO proper checks
     public boolean isComplete() {
-        if(what == null || where == null) return false;
+        if (what == null || where == null) return false;
         else return true;
     }
 }
