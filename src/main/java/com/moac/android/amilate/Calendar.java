@@ -13,13 +13,16 @@ import java.util.List;
 public class Calendar {
 
     private static final String TAG = Calendar.class.getSimpleName();
-
     private static final String[] CALENDAR_PROJECTION = new String[]{CalendarContract.Events.TITLE, CalendarContract.Events.EVENT_LOCATION, CalendarContract.Events.DTSTART};
 
     private List<CalendarEvent> mEvents;
 
     public Calendar(ContentResolver _contentResolver) {
         mEvents = getEvents(_contentResolver);
+    }
+
+    public List<CalendarEvent> getEvents() {
+        return mEvents;
     }
 
     private List<CalendarEvent> getEvents(ContentResolver _resolver) {
@@ -61,10 +64,6 @@ public class Calendar {
 //        mEvents.add(event3);
 //    }
 
-    public List<CalendarEvent> getEvents() {
-        return mEvents;
-    }
-
     private List<CalendarEvent> getNextHourEvents(ContentResolver _contentResolver) {
 
         String selection = "((" + CalendarContract.Events.DTSTART
@@ -84,7 +83,7 @@ public class Calendar {
         return query(nextHourCursor);
     }
 
-    private List<CalendarEvent> query(Cursor _cursor) {
+    private static List<CalendarEvent> query(Cursor _cursor) {
         List<CalendarEvent> results = new ArrayList<CalendarEvent>();
 
         _cursor.moveToFirst();

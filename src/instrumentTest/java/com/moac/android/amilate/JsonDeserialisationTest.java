@@ -14,9 +14,10 @@ import com.moac.android.amilate.api.model.Route;
 import java.util.List;
 
 /**
- * Candidate for JUNIT only test
+ * Candidate for Junit4 only test
+ *
  * Need to suppress warnings that say getContext could be null.
- * The AndroidTestCase already ensures that it isn't as vi test in itself.
+ * The AndroidTestCase already ensures that it isn't as via its own testcase.
  */
 
 @SuppressWarnings("ConstantConditions")

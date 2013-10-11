@@ -8,11 +8,6 @@ public class Leg {
     Distance distance;
     Duration duration;
 
-    public Distance getDistance() {
-        return distance;
-    }
-
-    public Duration getDuration() {
-        return duration;
-    }
+    public Distance getDistance() { return distance; }
+    public Duration getDuration() { return duration; }
 }

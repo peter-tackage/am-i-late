@@ -149,10 +149,8 @@ public class NotificationService extends Service {
                 long totalValue = 0;
                 List<Route> routes = directions.getRoutes();
                 if (!routes.isEmpty()) {
-                    // FIXME Check this assumption.
-                    // Pick the first, assume the best.
+                    // Pick the first, assume the best (usually only one, according to API docs)
                     Route bestRoute = routes.get(0);
-
                     for (Leg leg : bestRoute.getLegs()) {
                         // Get the time - DURATION IN SECONDS!!
                         totalValue += leg.getDuration().getValue();
@@ -165,6 +163,7 @@ public class NotificationService extends Service {
             return new NotificationEvent(mCalendarEvent, FAILURE);
         }
 
+        @Override
         public void onPostExecute(NotificationEvent _event) {
             if (_event == null || _event.getTravelTime() == FAILURE) {
                 Log.w(TAG, "Some problem determining whether late or not");

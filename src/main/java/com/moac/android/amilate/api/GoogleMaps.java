@@ -34,6 +34,9 @@ public interface GoogleMaps {
      * departure_time or arrival_time must be specified when requesting
      * transit directions.
      *
+     * sensor — Indicates whether or not the directions request comes from a device with a
+     * location sensor. This value must be either true or false.
+     *
      * Generally, only one entry in the "routes" array is returned for directions lookups,
      * though the Directions service may return several routes if you pass alternatives=true.
      */
