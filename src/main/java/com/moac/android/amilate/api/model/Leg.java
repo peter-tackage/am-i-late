@@ -5,8 +5,8 @@ package com.moac.android.amilate.api.model;
  */
 public class Leg {
 
-    Distance distance;
-    Duration duration;
+    private Distance distance;
+    private Duration duration;
 
     public Distance getDistance() { return distance; }
     public Duration getDuration() { return duration; }
