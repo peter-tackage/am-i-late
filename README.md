@@ -5,8 +5,11 @@ Born out of a Readmill hackathon this is a quick Android hack using location, Go
 
 It's a bit like Google Now, only slightly less creepy!
 
-Runs as a service and reports information as notifications, so it's not much to look at -
+It runs primarily as a Service and reports information as notifications, so it's not much to look at -
+
 <img src="https://github.com/peter-tackage/assets/raw/master/screenshots/am-i-late/Screenshot_2014-01-20-23-16-06.png" alt="I'm late! I'm late!" width="300">
+
+<img src="https://github.com/peter-tackage/assets/raw/master/screenshots/am-i-late/StatusBarNotification.png" alt="Appointment notification" width="300">
 
 It's built using the Gradle Android Plugin.
 
