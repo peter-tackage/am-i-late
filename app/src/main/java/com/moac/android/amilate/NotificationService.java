@@ -50,7 +50,7 @@ public class NotificationService extends Service {
         // Create the Google Maps API interface
         Uri.Builder uri = new Uri.Builder().scheme("http").authority("maps.googleapis.com");
         RestAdapter restAdapter = new RestAdapter.Builder()
-                .setServer(uri.toString())
+                .setEndpoint(uri.toString())
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
         mApi = restAdapter.create(GoogleMaps.class);
